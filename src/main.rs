@@ -11,7 +11,7 @@ use walkdir::WalkDir;
     long_about
 )]
 struct Args {
-    #[arg(short, long)]
+    #[arg(short, long, default_value = "./")]
     dir: String,
 
     #[arg(short, long)]

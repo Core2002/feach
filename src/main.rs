@@ -1,9 +1,15 @@
 use clap::Parser;
+use colored::*;
 use std::process::Command;
 use walkdir::WalkDir;
 
 #[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
+#[command(
+    author,
+    version,
+    about = "This tool can foreach dirs and run command.",
+    long_about
+)]
 struct Args {
     #[arg(short, long)]
     dir: String,
@@ -30,10 +36,11 @@ fn main() {
             let cmd_program = cmd_collect.remove(0);
 
             println!(
-                "RUN COMMAND WITH {} : {} {}",
+                "{} {} -> {} {}",
+                "[RUN COMMAND]".on_bright_blue(),
                 work_dir,
-                cmd_program,
-                cmd_collect.join(" ")
+                cmd_program.bright_blue(),
+                cmd_collect.join(" ").yellow()
             );
 
             let output = Command::new(cmd_program)
@@ -43,6 +50,6 @@ fn main() {
                 .unwrap()
                 .wait_with_output()
                 .expect("failed to execute process");
-            println!("{:?}", output);
+            println!("{}", format!("{:?}", output).purple());
         });
 }

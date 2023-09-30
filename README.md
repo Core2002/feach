@@ -8,6 +8,7 @@ Build:
 `cargo build --release`  
 
 Usage:  
+
 ```shell
 feach> .\target\release\feach.exe -h
 Usage: feach.exe [OPTIONS] --cmd <CMD>
@@ -16,6 +17,7 @@ Options:
   -d, --dir <DIR>        [default: ./]
   -c, --cmd <CMD>
   -l, --layers <LAYERS>  [default: 1]
+  -a, --async
   -h, --help             Print help
   -V, --version          Print version
 ```

@@ -14,14 +14,38 @@ struct Args {
     #[arg(short, long, default_value = "./")]
     dir: String,
 
-    #[arg(short, long)]
-    cmd: String,
+    #[arg(short, long, num_args = 1..)]
+    cmd: Vec<String>,
 
     #[arg(short, long, default_value_t = 1)]
     layers: u8,
 
     #[arg(short, long)]
     r#async: bool,
+}
+
+fn parse_cmd_args(cmd: &str) -> Vec<String> {
+    let mut args = Vec::new();
+    let mut current = String::new();
+    let mut in_single_quote = false;
+    let mut in_double_quote = false;
+
+    for c in cmd.chars() {
+        match c {
+            '\'' if !in_double_quote => in_single_quote = !in_single_quote,
+            '"' if !in_single_quote => in_double_quote = !in_double_quote,
+            ' ' if !in_single_quote && !in_double_quote => {
+                if !current.is_empty() {
+                    args.push(std::mem::take(&mut current));
+                }
+            }
+            _ => current.push(c),
+        }
+    }
+    if !current.is_empty() {
+        args.push(current);
+    }
+    args
 }
 
 fn do_command4_dir_async(work_dir: String, cmd_program: String, cmd_args: Vec<String>) {
@@ -51,8 +75,8 @@ async fn main() {
         .filter(|file| file.file_type().is_dir())
         .for_each(|dir| {
             let work_dir: String = dir.path().to_str().unwrap().to_string();
-            let mut cmd_args: Vec<String> =
-                args.cmd.split(' ').map(|arg| arg.to_string()).collect();
+            let cmd_str = args.cmd.join(" ");
+            let mut cmd_args = parse_cmd_args(&cmd_str);
             let cmd_program: String = cmd_args.remove(0).to_string();
             println!(
                 "{} {} -> {} {}",
